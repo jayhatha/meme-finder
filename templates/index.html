@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+  <meta charset="utf-8">
+  <title>basic meme finder</title>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700|Quicksand:300,400" rel="stylesheet">
+  <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='stylesheets/style.css') }}" />
+</head>
+<body>
+  <header>
+    <h1>Simple Meme Finder</h1>
+    <h3>v. 0.2</h3>
+  </header>
+  <div class="container">
+    <div class="twitter">
+      <div class="header">
+        <h2>Top Meme Words (Past 2 Weeks)</h2>
+      </div>
+      <div class="list">
+        {{ memetable|safe }}
+      </div>
+    </div>
+    <div class="reddit">
+      <div class="header">
+        <h2>Top Meme Pairs (Past 2 Weeks)</h2>
+      </div>
+      <div class="list">
+          {{ pairtable|safe }}
+      </div>
+    </div>
+  </div>
+</body>
+</html>
