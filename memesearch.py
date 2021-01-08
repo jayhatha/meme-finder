@@ -1,4 +1,4 @@
-#importing all our tweepy and nltk requirements
+# importing all our tweepy and nltk requirements
 # fyi i borrowed some of this from marco bonzanini (https://marcobonzanini.com/2015/03/02/mining-twitter-data-with-python-part-1/)
 import os
 import tweepy
@@ -16,19 +16,21 @@ from collections import Counter
 from nltk.tokenize import TweetTokenizer
 from nltk.corpus import stopwords
 from nltk import bigrams
+from nltk import stem
 from collections import defaultdict
 import flask
 from flask import render_template
 app = flask.Flask(__name__)
-#access tokens go here
+lemmatizer = nltk.stem.WordNetLemmatizer()
+# access tokens go here
 MY_CONSUMER_KEY = os.environ.get('MY_CONSUMER_KEY')
 MY_CONSUMER_SECRET = os.environ.get('MY_CONSUMER_SECRET')
 MY_ACCESS_TOKEN_KEY = os.environ.get('MY_ACCESS_TOKEN_KEY')
 MY_ACCESS_TOKEN_SECRET = os.environ.get('MY_ACCESS_TOKEN_SECRET')
-#authenticating w/ twitter api
+# authenticating w/ twitter api
 auth = tweepy.OAuthHandler(MY_CONSUMER_KEY, MY_CONSUMER_SECRET)
 auth.set_access_token(MY_ACCESS_TOKEN_KEY, MY_ACCESS_TOKEN_SECRET)
-#searching multiple pages
+# searching multiple pages
 api = tweepy.API(auth)
 query = '\"these * memes\" OR \"these * * memes\" OR \"the * meme is\" OR \"that * meme\" OR \"meme except\" OR \"meme needs to\" OR \"a meme now\" -rt -@ -http -#dad -.com -ift -filter:replies'
 max_tweets = 10000
@@ -37,7 +39,8 @@ last_id = -1
 while len(searched_tweets) < max_tweets:
     count = max_tweets - len(searched_tweets)
     try:
-        new_tweets = api.search(q=query, count=count, max_id=str(last_id - 1), result_type='recent', lang='en', wait_on_rate_limit='true', wait_on_rate_limit_notify='true')
+        new_tweets = api.search(q=query, count=count, max_id=str(
+            last_id - 1), result_type='recent', lang='en', wait_on_rate_limit='true', wait_on_rate_limit_notify='true')
         if not new_tweets:
             break
         searched_tweets.extend(new_tweets)
@@ -48,7 +51,7 @@ while len(searched_tweets) < max_tweets:
 punctuation = list(string.punctuation)
 extrastops = open('stopwords.txt', 'r').read().split()
 stop = stopwords.words('english') + punctuation + extrastops
-#dumping our tweets to a json file
+# dumping our tweets to a json file
 with open('tweets.json', 'w') as outfile:
     for tweet in searched_tweets:
         try:
@@ -63,7 +66,7 @@ with open('tweets.json', 'w') as outfile:
     print('collocations:')
     print(finder.nbest(bigram_measures.pmi, 10))  # doctest: +NORMALIZE_WHITESPACE
 """
-#getting just the text of the tweets, i think?
+# getting just the text of the tweets, i think?
 """
 with open('tweets.json', 'r') as f:
     for line in f:
@@ -119,47 +122,52 @@ with open('tweets.json', "r") as readfile:
 
 frequency = {}
 """
-#converting our meme terms to twitter queries
+# converting our meme terms to twitter queries
+
+
 def toLink(a):
     b = '<a href="https://twitter.com/search?l=en&q=' + a + 'lang=en\"</a>'
     return b
 
-#counting word frequencies
+
+# counting word frequencies
 count_all = Counter()
 document_text = open('tweets.json', 'r')
 text_string = document_text.read().lower()
 match_pattern = re.findall(r'(?<![@])\b[a-zA-Z]{3,15}\b', text_string)
 filtered_words = [term for term in match_pattern if term not in stop]
-#counting pairs
-pairs = bigrams(filtered_words)
+lemmas = [lemmatizer.lemmatize(t) for t in filtered_words]
+# counting pairs
+pairs = bigrams(lemmas)
 count_all.update(pairs)
 #print('most common pairs:')
 pairs = (count_all.most_common(25))
-#print(count_all.most_common(25))
-#resetting counter and counting single words
+# print(count_all.most_common(25))
+# resetting counter and counting single words
 count_all = Counter()
-count_all.update(filtered_words)
+count_all.update(lemmas)
 #print('most common words:')
 memes = (count_all.most_common(50))
-#making dataframes for our memes and pairs
+# making dataframes for our memes and pairs
 memedf = pandas.DataFrame(memes, columns=['term', 'count'])
 pairdf = pandas.DataFrame(pairs, columns=['term', 'count'])
 #memedf['term'] = memedf['term'].apply(toLink)
-#turning them into html tables
+# turning them into html tables
 memetable = memedf.to_html(escape=False)
 pairtable = pairdf.to_html(escape=False)
 
 
-"""
-print(count_all.most_common(50))
-print(pairs)
-print(memes)
+# print(count_all.most_common(50))
+# print(pairs)
+# print(memes)
 
-"""
-#rendering tables that will show up on index.html
+
+# rendering tables that will show up on index.html
 @app.route('/')
 def index():
-    return render_template('index.html', memes = memes, pairs = pairs, memetable = memetable, pairtable = pairtable)
+    return render_template('index.html', memes=memes, pairs=pairs, memetable=memetable, pairtable=pairtable)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
 
