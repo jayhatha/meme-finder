@@ -2,10 +2,6 @@ tweepy==3.6.0
 nltk==3.2.5
 jsonschema==2.6.0
 gunicorn>=19.0.0
-<<<<<<< HEAD
-Flask==1.0.0
-=======
 Flask==0.12.2
->>>>>>> ff7af3fd17e5e52595a1d1bd06d66a0a0a8585db
 Flask-Cors==3.0.3
 pandas==0.22.0
