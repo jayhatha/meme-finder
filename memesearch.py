@@ -20,7 +20,6 @@ from nltk import stem
 from collections import defaultdict
 import flask
 from flask import render_template
-nltk.download('wordnet')
 app = flask.Flask(__name__)
 lemmatizer = nltk.stem.WordNetLemmatizer()
 # access tokens go here
