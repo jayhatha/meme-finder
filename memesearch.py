@@ -15,12 +15,12 @@ from nltk.collocations import *
 from collections import Counter
 from nltk.tokenize import TweetTokenizer
 from nltk.corpus import stopwords
-from nltk.corpus import wordnet
 from nltk import bigrams
 from nltk import stem
 from collections import defaultdict
 import flask
 from flask import render_template
+nltk.download('wordnet')
 app = flask.Flask(__name__)
 lemmatizer = nltk.stem.WordNetLemmatizer()
 # access tokens go here
