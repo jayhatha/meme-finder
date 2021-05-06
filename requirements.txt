@@ -3,5 +3,5 @@ nltk==3.4.5
 jsonschema==2.6.0
 gunicorn>=19.0.0
 Flask==1.0
-Flask-Cors==3.0.3
+Flask-Cors==3.0.9
 pandas==0.22.0
